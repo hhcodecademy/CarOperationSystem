@@ -2,6 +2,7 @@
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.FileProviders;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
 {
@@ -11,13 +12,19 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
         private readonly IGenericRepository<Model> _modelRepository;
         private readonly IGenericRepository<Brand> _brandRepository;
         private readonly IGenericRepository<Car> _carRepository;
+        private readonly IWebHostEnvironment _hostEnvironment;
+        private readonly IFileProvider _fileProvider;
         public CarsController(IGenericRepository<Model> modelRepository,
             IGenericRepository<Brand> brandRepository,
-            IGenericRepository<Car> carRepository)
+            IGenericRepository<Car> carRepository,
+            IWebHostEnvironment hostEnvironment,
+            IFileProvider fileProvider)
         {
             _modelRepository = modelRepository;
             _brandRepository = brandRepository;
             _carRepository = carRepository;
+            _hostEnvironment = hostEnvironment;
+            _fileProvider = fileProvider;
         }
         public async Task<IActionResult> Index()
         {
@@ -26,6 +33,7 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
             var cars = carTasks.ToList();
             foreach (var car in cars)
             {
+             
                 carModels.Add(new CarVM
                 {
                     Id = car.Id,
@@ -35,6 +43,8 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
                     ModelName = _modelRepository.Get(car.ModelId).Result.Name,
                     Milage = car.Milage,
                     Color = car.Color,
+                    Thumbnail= car.Thumbnail,
+                   
                 });
             }
             return View(carModels);
@@ -44,7 +54,7 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
             CarVM modelView = new CarVM();
             var brands = await _brandRepository.GetAll();
             modelView.Brands = brands.ToList();
-            modelView.BrandId = brandId ?? 0; 
+            modelView.BrandId = brandId ?? 0;
             var models = await _modelRepository.GetAll();
             modelView.Models = models.ToList();
             modelView.ModelId = modelId ?? 0;
@@ -56,12 +66,30 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
             Car cardModel = new Car()
             {
                 BrandId = model.BrandId,
-                ModelId= model.ModelId,
-              Milage= model.Milage,
-              Color = model.Color,
+                ModelId = model.ModelId,
+                Milage = model.Milage,
+                Color = model.Color,
             };
+            cardModel.Thumbnail = UploadImage(model.Image);
             await _carRepository.Add(cardModel);
             return RedirectToAction("Index");
+        }
+        private string UploadImage(IFormFile file)
+        {
+            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+
+            string localPath = _hostEnvironment.WebRootPath;
+
+            var filePath = Path.Combine(localPath, "images", fileName);
+
+            // Create a new local file and copy contents of the uploaded file
+            using (var localFile = System.IO.File.OpenWrite(filePath))
+            using (var uploadedFile = file.OpenReadStream())
+            {
+                uploadedFile.CopyTo(localFile);
+            }
+
+            return fileName;
         }
     }
 }

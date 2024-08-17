@@ -2,6 +2,7 @@ using CarOperationSystem.DAL.Data;
 using CarOperationSystem.DAL.Repository;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 namespace CarOperationSystem.UI
 {
@@ -17,6 +18,10 @@ namespace CarOperationSystem.UI
             builder.Services.AddDbContext<CustomDbContext>(
             opts => opts.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnectionString")));
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            IFileProvider physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
+            builder.Services.AddSingleton<IFileProvider>(physicalProvider);
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

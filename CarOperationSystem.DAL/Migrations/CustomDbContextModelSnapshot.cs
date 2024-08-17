@@ -69,6 +69,10 @@ namespace CarOperationSystem.DAL.Migrations
                     b.Property<int>("ModelId")
                         .HasColumnType("int");
 
+                    b.Property<string>("Thumbnail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("UpdateDate")
                         .HasColumnType("datetime2");
 
@@ -110,6 +114,37 @@ namespace CarOperationSystem.DAL.Migrations
                     b.HasIndex("BrandId");
 
                     b.ToTable("Models");
+                });
+
+            modelBuilder.Entity("CarOperationSystem.DAL.Models.SpareItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SpareItems");
                 });
 
             modelBuilder.Entity("CarOperationSystem.DAL.Models.Car", b =>

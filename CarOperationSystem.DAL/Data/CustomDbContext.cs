@@ -21,5 +21,6 @@ namespace CarOperationSystem.DAL.Data
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Model> Models { get; set; }
         public DbSet<Car> Cars { get; set; }
+        public DbSet<SpareItem> SpareItems { get; set; }
     }
 }

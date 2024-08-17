@@ -14,5 +14,7 @@ namespace CarOperationSystem.UI.Models
         public int Year { get; set; }
         public string Color { get; set; }
         public int Milage { get; set; }
+        public IFormFile Image { get; set; }
+        public string Thumbnail { get; set; }
     }
 }

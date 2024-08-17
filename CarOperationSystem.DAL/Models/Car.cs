@@ -15,5 +15,6 @@ namespace CarOperationSystem.DAL.Models
         public int Year { get; set; }
         public string Color { get; set; }
         public int Milage { get; set; }
+        public string Thumbnail { get; set; }
     }
 }

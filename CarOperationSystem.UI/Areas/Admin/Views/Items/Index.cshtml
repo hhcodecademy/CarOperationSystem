@@ -1,0 +1,45 @@
+﻿﻿@{
+    ViewData["Title"] = "Index";
+}
+@model List<SpareItemVM>
+
+<div class="row justify-content-end">
+    <div class="col-4 d-flex justify-content-end">
+        @Html.ActionLink("Add", "Create", "Items", new { area = "admin" }, new { @class = "btn btn-primary" })
+    </div>
+</div>
+<div class="row">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">URL</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (SpareItemVM item in Model)
+            {
+                <tr>
+                    <th scope="row">@item.Id</th>
+                    <td>@item.Name</td>
+                    <td>@item.Description</td>
+                    <td>@item.Url</td>
+                    <td>
+                        <a class="btn btn-warning" asp-area="admin" asp-controller="Items" asp-action="Edit" asp-route-id="@item.Id">
+                            <i class="far fa-pen-to-square"></i>
+
+                        </a>
+                        <a class="btn btn-danger" asp-area="admin" asp-controller="Items" asp-action="Delete" asp-route-id="@item.Id">
+                            <i class="fas fa-trash-can"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+
+
+        </tbody>
+    </table>
+</div>
