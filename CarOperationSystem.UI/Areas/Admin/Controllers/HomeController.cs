@@ -7,6 +7,8 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
     {
         public IActionResult Index()
         {
+            string fullname = Request.Cookies["fullname"];
+            ViewBag.fullname = fullname;
             return View();
         }
     }

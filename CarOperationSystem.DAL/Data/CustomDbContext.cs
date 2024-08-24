@@ -22,5 +22,6 @@ namespace CarOperationSystem.DAL.Data
         public DbSet<Model> Models { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<SpareItem> SpareItems { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

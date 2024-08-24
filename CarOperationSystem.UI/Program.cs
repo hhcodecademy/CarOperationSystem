@@ -41,7 +41,7 @@ namespace CarOperationSystem.UI
 
             app.MapControllerRoute(
                   name: "areas",
-                  pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                  pattern: "{area:exists}/{controller=Account}/{action=LogIn}/{id?}"
                 );
            
             app.MapControllerRoute(
