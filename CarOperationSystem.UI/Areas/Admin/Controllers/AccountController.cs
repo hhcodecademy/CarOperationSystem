@@ -1,6 +1,7 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Areas.Admin.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
@@ -9,10 +10,14 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
     [Area("admin")]
     public class AccountController : Controller
     {
-        private readonly IGenericRepository<User> _userRepository;
-        public AccountController(IGenericRepository<User> userRepository)
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+        public AccountController(
+            UserManager<IdentityUser> userManager,
+            SignInManager<IdentityUser> signInManager)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         public IActionResult LogIn()
@@ -22,27 +27,70 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> LogIn(Account model)
         {
-            var users = await _userRepository.GetAll();
+            IdentityUser identityUser = new IdentityUser() { 
+            
+              Email = model.Email,
+              UserName=model.Email,
+            };
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            await _signInManager.SignInAsync(user, false);
             CookieOptions options = new CookieOptions()
             {
                 Domain = "localhost",
                 Path = "/",
                 Expires = DateTime.Now.AddMinutes(10),
             };
-            foreach (var user in users)
-            {
-                if (user.Email == model.Email && user.Password == model.Password)
-                {
 
-                    Response.Cookies.Append("email", user.Email, options);
-                    Response.Cookies.Append("fullname", user.Name+" "+user.Surname, options);
+          
+                Response.Cookies.Append("email", user.Email, options);
+  
+                Response.Cookies.Append("fullname", user.Email, options);
 
-                    return RedirectToAction("Index", "Home");
-                }
-            }
-        
+                return RedirectToAction("Index", "Home");
+
+                
+             
+          
+
             return View(model);
         }
+        public IActionResult Registration()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Registration(Account model)
+        {
+            if (ModelState.IsValid)
+            {
+                IdentityUser user = new IdentityUser()
+                {
 
+                    Email = model.Email,
+                    UserName = model.Email,
+
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, false);
+                    return RedirectToAction("Index", "Home");
+                }
+                else {
+
+                    foreach (var item in result.Errors)
+                    {
+                        ModelState.AddModelError("", item.Description);
+                    }
+                }
+
+            }
+            else
+            {
+
+                return View(model);
+            }
+            return View();
+        }
     }
 }

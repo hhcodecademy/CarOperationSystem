@@ -1,5 +1,6 @@
 ﻿using CarOperationSystem.DAL.Configuration;
 using CarOperationSystem.DAL.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CarOperationSystem.DAL.Data
 {
-    public class CustomDbContext:DbContext
+    public class CustomDbContext: IdentityDbContext
     {
         public CustomDbContext(DbContextOptions<CustomDbContext> options) : base(options) { }
 
@@ -22,6 +23,5 @@ namespace CarOperationSystem.DAL.Data
         public DbSet<Model> Models { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<SpareItem> SpareItems { get; set; }
-        public DbSet<User> Users { get; set; }
     }
 }

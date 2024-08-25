@@ -1,8 +1,10 @@
 using CarOperationSystem.DAL.Data;
 using CarOperationSystem.DAL.Repository;
 using CarOperationSystem.DAL.Repository.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 
 namespace CarOperationSystem.UI
 {
@@ -22,6 +24,17 @@ namespace CarOperationSystem.UI
             IFileProvider physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             builder.Services.AddSingleton<IFileProvider>(physicalProvider);
 
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
+
+                opts.Password.RequireDigit = true;
+                opts.Password.RequireLowercase = false;
+                opts.Password.RequireNonAlphanumeric = false;
+                opts.Password.RequireUppercase = false;
+                opts.Password.RequiredLength = 6;
+
+            }).AddEntityFrameworkStores<CustomDbContext>();
+
+         
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

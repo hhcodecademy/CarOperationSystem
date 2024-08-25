@@ -1,6 +1,7 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Protocol.Core.Types;
 
@@ -8,11 +9,11 @@ namespace CarOperationSystem.UI.ViewComponents
 {
     public class UserInfoViewComponent : ViewComponent
     {
-        private readonly IGenericRepository<User> _userRepository;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public UserInfoViewComponent(IGenericRepository<User> userRepository)
+        public UserInfoViewComponent( UserManager<IdentityUser> userManager)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -21,19 +22,12 @@ namespace CarOperationSystem.UI.ViewComponents
             return View(user);
         }
 
-        private async Task<User> GetUserInfo()
+        private async Task<IdentityUser> GetUserInfo()
         {
 
             string email = Request.Cookies["email"];
-            var users = await _userRepository.GetAll();
-            User user = null;
-            foreach (var item in users)
-            {
-                if (item.Email == email)
-                {
-                    user= item;
-                }
-            }
+            var user = await _userManager.FindByEmailAsync(email);
+         
             return user;
         }
     }
