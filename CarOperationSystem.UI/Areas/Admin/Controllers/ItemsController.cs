@@ -1,11 +1,13 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
 {
     [Area("admin")]
+    [Authorize(Roles = "Student")]
     public class ItemsController : Controller
     {
         private readonly IGenericRepository<SpareItem> _itemRepository;

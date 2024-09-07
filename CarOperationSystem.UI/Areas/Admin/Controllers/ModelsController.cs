@@ -1,11 +1,13 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
 {
     [Area("admin")]
+    [Authorize(Roles = "ReportManager")]
     public class ModelsController : Controller
     {
         private readonly IGenericRepository<Model> _modelRepository;

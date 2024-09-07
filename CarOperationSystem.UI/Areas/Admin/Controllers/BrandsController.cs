@@ -1,10 +1,12 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
 {
     [Area("admin")]
+    [Authorize(Roles = "Manager")]
     public class BrandsController : Controller
     {
         private readonly IGenericRepository<Brand> _brandRepository;
