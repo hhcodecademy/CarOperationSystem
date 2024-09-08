@@ -1,8 +1,10 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Areas.Admin.Models;
+using CarOperationSystem.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Policy;
 
 namespace CarOperationSystem.UI.Areas.Admin.Controllers
 {
@@ -12,12 +14,15 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly IEmailService _emailService;
         public AccountController(
             UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            SignInManager<IdentityUser> signInManager,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _emailService = emailService;
         }
 
         public IActionResult LogIn()
@@ -25,41 +30,77 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> LogIn(Account model)
+        public async Task<IActionResult> LogIn(AccountVM model)
         {
-            IdentityUser identityUser = new IdentityUser() { 
-            
-              Email = model.Email,
-              UserName=model.Email,
-            };
+
             var user = await _userManager.FindByEmailAsync(model.Email);
-            await _signInManager.SignInAsync(user, false);
-            CookieOptions options = new CookieOptions()
+            var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.Persistent, false);
+            if (result.Succeeded)
             {
-                Domain = "localhost",
-                Path = "/",
-                Expires = DateTime.Now.AddMinutes(10),
-            };
-
-          
-                Response.Cookies.Append("email", user.Email, options);
-  
-                Response.Cookies.Append("fullname", user.Email, options);
-
                 return RedirectToAction("Index", "Home");
+            }
 
-                
-             
-          
+            return View();
 
-            return View(model);
+
+
+
+        }
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public  async Task<IActionResult> ChangePassword(string userId,  string token, AccountVM model)
+        {
+            var user = await  _userManager.FindByIdAsync(userId);
+            if (user is null)
+            {
+                return View();
+            }
+            else
+            {
+               var result= await  _userManager.ResetPasswordAsync(user, token, model.Password);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("LogIn", "Account");
+                }
+            
+            }
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(AccountVM model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "Email not found";
+                return View();
+            }
+
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+
+
+            string createdUrl = Url.Action("ChangePassword", "Account", new { userId = user.Id, Token = token },HttpContext.Request.Scheme);
+
+            _emailService.SendMail(createdUrl, "huseyn.hasanli@code.edu.az");
+
+            ViewBag.SuccessMessage = "Email sent to mail";
+
+            return View();
         }
         public IActionResult Registration()
         {
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Registration(Account model)
+        public async Task<IActionResult> Registration(AccountVM model)
         {
             if (ModelState.IsValid)
             {
@@ -76,7 +117,8 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
                     await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
-                else {
+                else
+                {
 
                     foreach (var item in result.Errors)
                     {

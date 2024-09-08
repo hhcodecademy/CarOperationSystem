@@ -1,6 +1,7 @@
 ﻿using CarOperationSystem.DAL.Models;
 using CarOperationSystem.DAL.Repository.Interfaces;
 using CarOperationSystem.UI.Models;
+using CarOperationSystem.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
@@ -16,20 +17,25 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
         private readonly IGenericRepository<Car> _carRepository;
         private readonly IWebHostEnvironment _hostEnvironment;
         private readonly IFileProvider _fileProvider;
+
+        private readonly IEmailService _emailService;
         public CarsController(IGenericRepository<Model> modelRepository,
             IGenericRepository<Brand> brandRepository,
             IGenericRepository<Car> carRepository,
             IWebHostEnvironment hostEnvironment,
-            IFileProvider fileProvider)
+            IFileProvider fileProvider,
+            IEmailService emailService)
         {
             _modelRepository = modelRepository;
             _brandRepository = brandRepository;
             _carRepository = carRepository;
             _hostEnvironment = hostEnvironment;
             _fileProvider = fileProvider;
+            _emailService = emailService;
         }
         public async Task<IActionResult> Index()
         {
+            _emailService.SendMail("AddCars", "aliaea@code.edu.az");
             var carTasks = await _carRepository.GetAll();
             List<CarVM> carModels = new List<CarVM>();
             var cars = carTasks.ToList();
@@ -74,6 +80,7 @@ namespace CarOperationSystem.UI.Areas.Admin.Controllers
             };
             cardModel.Thumbnail = UploadImage(model.Image);
             await _carRepository.Add(cardModel);
+    
             return RedirectToAction("Index");
         }
         private string UploadImage(IFormFile file)

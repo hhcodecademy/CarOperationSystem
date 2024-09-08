@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarOperationSystem.UI", "CarOperationSystem.UI\CarOperationSystem.UI.csproj", "{9483712C-5083-489D-924A-FB7B48DDC85C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarOperationSystem.UI", "CarOperationSystem.UI\CarOperationSystem.UI.csproj", "{9483712C-5083-489D-924A-FB7B48DDC85C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarOperationSystem.DAL", "CarOperationSystem.DAL\CarOperationSystem.DAL.csproj", "{D034560A-51BB-4AA4-A7E3-CCE6F4EF501A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarOperationSystem.DAL", "CarOperationSystem.DAL\CarOperationSystem.DAL.csproj", "{D034560A-51BB-4AA4-A7E3-CCE6F4EF501A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

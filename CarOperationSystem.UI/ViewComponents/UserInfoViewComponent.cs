@@ -25,8 +25,8 @@ namespace CarOperationSystem.UI.ViewComponents
         private async Task<IdentityUser> GetUserInfo()
         {
 
-            string email = Request.Cookies["email"];
-            var user = await _userManager.FindByEmailAsync(email);
+            string username = User.Identity.Name; ;
+            var user = await _userManager.FindByNameAsync(username);
          
             return user;
         }

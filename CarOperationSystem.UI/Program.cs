@@ -1,10 +1,12 @@
 using CarOperationSystem.DAL.Data;
 using CarOperationSystem.DAL.Repository;
 using CarOperationSystem.DAL.Repository.Interfaces;
+using CarOperationSystem.UI.Configurations;
+using CarOperationSystem.UI.Services;
+using CarOperationSystem.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
 
 namespace CarOperationSystem.UI
 {
@@ -24,7 +26,8 @@ namespace CarOperationSystem.UI
             IFileProvider physicalProvider = new PhysicalFileProvider(Directory.GetCurrentDirectory());
             builder.Services.AddSingleton<IFileProvider>(physicalProvider);
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
+            {
 
                 opts.Password.RequireDigit = true;
                 opts.Password.RequireLowercase = false;
@@ -32,9 +35,33 @@ namespace CarOperationSystem.UI
                 opts.Password.RequireUppercase = false;
                 opts.Password.RequiredLength = 6;
 
-            }).AddEntityFrameworkStores<CustomDbContext>();
+            }).AddEntityFrameworkStores<CustomDbContext>()
+            .AddDefaultTokenProviders();
 
-         
+            builder.Services.Configure<DataProtectionTokenProviderOptions>(opts =>
+            {
+                opts.TokenLifespan = TimeSpan.FromHours(2);
+            });
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
+
+            builder.Services.ConfigureApplicationCookie(cf =>
+            {
+
+                CookieBuilder cookieBuilder = new CookieBuilder()
+                {
+                    Name = "CarOperationUI",
+                    Path = "/",
+
+
+                };
+                cf.Cookie = cookieBuilder;
+                cf.ExpireTimeSpan = TimeSpan.FromDays(1);
+
+            });
+
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -56,7 +83,7 @@ namespace CarOperationSystem.UI
                   name: "areas",
                   pattern: "{area:exists}/{controller=Account}/{action=LogIn}/{id?}"
                 );
-           
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
